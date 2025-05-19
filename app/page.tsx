@@ -4,9 +4,18 @@ import Link from 'next/link';
 import styles from '@/app/ui/home.module.css';
 import { lusitana } from '@/app/ui/fonts';
 import Image from 'next/image';
+import { neon } from '@neondatabase/serverless';
 
 
 export default function Page() {
+  async function create(formData: FormData) {
+    'use server';
+
+    const sql = neon(process.env.DATABASE_URL!);
+    const comment = formData.get('comment');
+
+    await sql`INSERT INTO comments (comment) VALUES (${comment})`;
+  }
   return (
     <main className="flex min-h-screen flex-col p-6">
       <div className="flex h-20 shrink-0 items-end rounded-lg bg-blue-500 p-4 md:h-52">
@@ -49,6 +58,21 @@ export default function Page() {
       />
         </div>
       </div>
+
+      <form action={create} className="mt-8 max-w-md self-center">
+        <input
+          type="text"
+          name="comment"
+          placeholder="Escribe un comentario"
+          className="w-full rounded-md border border-gray-300 px-4 py-2 text-black"
+        />
+        <button
+          type="submit"
+          className="mt-2 w-full rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-400"
+        >
+          Enviar comentario
+        </button>
+      </form>
     </main>
   );
 }
